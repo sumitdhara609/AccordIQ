@@ -1,11 +1,9 @@
 package com.accordiq.document.entity;
 
+import com.accordiq.common.entity.BaseEntity;
 import com.accordiq.document.enums.DocumentStatus;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(name = "documents")
@@ -14,11 +12,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Document {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+public class Document extends BaseEntity {
 
     @Column(nullable = false)
     private String originalFileName;
@@ -37,26 +31,6 @@ public class Document {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private DocumentStatus status;
-
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime uploadedAt;
-
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
-
-    @PrePersist
-    public void prePersist() {
-        uploadedAt = LocalDateTime.now();
-        updatedAt = uploadedAt;
-
-        if (status == null) {
-            status = DocumentStatus.UPLOADED;
-        }
-    }
-
-    @PreUpdate
-    public void preUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
+    @Builder.Default
+    private DocumentStatus status = DocumentStatus.UPLOADED;
 }
