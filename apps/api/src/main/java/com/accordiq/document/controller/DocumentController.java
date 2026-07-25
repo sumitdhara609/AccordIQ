@@ -2,8 +2,12 @@ package com.accordiq.document.controller;
 
 import com.accordiq.common.response.ApiResponse;
 import com.accordiq.document.dto.response.DocumentResponse;
+import com.accordiq.document.dto.response.DownloadDocumentResponse;
 import com.accordiq.document.dto.response.UploadDocumentResponse;
 import com.accordiq.document.service.DocumentService;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -60,6 +64,38 @@ public class DocumentController {
                         true,
                         "Document retrieved successfully.",
                         documentService.getDocumentById(id)
+                )
+        );
+    }
+
+    @GetMapping("/{id}/download")
+    public ResponseEntity<Resource> downloadDocument(
+            @PathVariable UUID id
+    ) {
+
+        DownloadDocumentResponse response = documentService.download(id);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(response.contentType()))
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + response.originalFileName() + "\""
+                )
+                .body(response.resource());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteDocument(
+            @PathVariable UUID id
+    ) throws IOException {
+
+        documentService.delete(id);
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        true,
+                        "Document deleted successfully.",
+                        null
                 )
         );
     }

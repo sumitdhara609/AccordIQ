@@ -1,6 +1,7 @@
 package com.accordiq.document.service;
 
 import com.accordiq.document.dto.response.DocumentResponse;
+import com.accordiq.document.dto.response.DownloadDocumentResponse;
 import com.accordiq.document.dto.response.UploadDocumentResponse;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,4 +16,8 @@ public interface DocumentService {
     List<DocumentResponse> getAllDocuments();
 
     DocumentResponse getDocumentById(UUID id);
+
+    DownloadDocumentResponse download(UUID id);
+
+    void delete(UUID id) throws IOException;
 }
