@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/documents")
@@ -45,6 +46,20 @@ public class DocumentController {
                         true,
                         "Documents retrieved successfully.",
                         documentService.getAllDocuments()
+                )
+        );
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<DocumentResponse>> getDocumentById(
+            @PathVariable UUID id
+    ) {
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        true,
+                        "Document retrieved successfully.",
+                        documentService.getDocumentById(id)
                 )
         );
     }

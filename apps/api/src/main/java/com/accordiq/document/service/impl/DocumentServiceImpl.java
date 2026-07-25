@@ -1,5 +1,6 @@
 package com.accordiq.document.service.impl;
 
+import com.accordiq.common.exception.ResourceNotFoundException;
 import com.accordiq.document.dto.response.DocumentResponse;
 import com.accordiq.document.dto.response.UploadDocumentResponse;
 import com.accordiq.document.entity.Document;
@@ -11,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class DocumentServiceImpl implements DocumentService {
@@ -66,5 +68,24 @@ public class DocumentServiceImpl implements DocumentService {
                         document.getStatus()
                 ))
                 .toList();
+    }
+
+    @Override
+    public DocumentResponse getDocumentById(UUID id) {
+
+        Document document = documentRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Document not found with id: " + id
+                        )
+                );
+
+        return new DocumentResponse(
+                document.getId(),
+                document.getOriginalFileName(),
+                document.getContentType(),
+                document.getFileSize(),
+                document.getStatus()
+        );
     }
 }
