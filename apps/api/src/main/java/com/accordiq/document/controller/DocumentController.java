@@ -1,6 +1,7 @@
 package com.accordiq.document.controller;
 
 import com.accordiq.common.response.ApiResponse;
+import com.accordiq.document.dto.response.DocumentResponse;
 import com.accordiq.document.dto.response.UploadDocumentResponse;
 import com.accordiq.document.service.DocumentService;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/documents")
@@ -31,6 +33,18 @@ public class DocumentController {
                         true,
                         "Document uploaded successfully.",
                         response
+                )
+        );
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<DocumentResponse>>> getAllDocuments() {
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        true,
+                        "Documents retrieved successfully.",
+                        documentService.getAllDocuments()
                 )
         );
     }
