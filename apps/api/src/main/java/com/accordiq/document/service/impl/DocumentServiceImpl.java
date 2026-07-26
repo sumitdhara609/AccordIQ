@@ -1,12 +1,20 @@
 package com.accordiq.document.service.impl;
 
 import com.accordiq.common.exception.ResourceNotFoundException;
+import com.accordiq.document.dto.request.DocumentSearchRequest;
 import com.accordiq.document.dto.response.DocumentResponse;
+import com.accordiq.document.dto.response.DocumentSearchResponse;
 import com.accordiq.document.dto.response.UploadDocumentResponse;
 import com.accordiq.document.entity.Document;
 import com.accordiq.document.repository.DocumentRepository;
 import com.accordiq.document.service.DocumentService;
+import com.accordiq.document.specification.DocumentSpecification;
 import com.accordiq.storage.service.FileStorageService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -87,5 +95,35 @@ public class DocumentServiceImpl implements DocumentService {
                 document.getFileSize(),
                 document.getStatus()
         );
+    }
+
+    @Override
+    public Page<DocumentSearchResponse> search(DocumentSearchRequest request) {
+
+        Sort sort = Sort.by(
+                Sort.Direction.fromString(request.getSortDirection()),
+                request.getSortBy()
+        );
+
+        Pageable pageable = PageRequest.of(
+                request.getPage(),
+                request.getSize(),
+                sort
+        );
+
+        Specification<Document> specification =
+                DocumentSpecification.hasFilename(request.getFilename())
+                        .and(DocumentSpecification.hasContentType(request.getContentType()))
+                        .and(DocumentSpecification.uploadedAfter(request.getUploadedFrom()))
+                        .and(DocumentSpecification.uploadedBefore(request.getUploadedTo()));
+
+        return documentRepository.findAll(specification, pageable)
+                .map(document -> DocumentSearchResponse.builder()
+                        .id(document.getId())
+                        .originalFilename(document.getOriginalFileName())
+                        .contentType(document.getContentType())
+                        .fileSize(document.getFileSize())
+                        .createdAt(document.getCreatedAt())
+                        .build());
     }
 }

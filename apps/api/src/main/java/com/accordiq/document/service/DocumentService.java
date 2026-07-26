@@ -1,7 +1,10 @@
 package com.accordiq.document.service;
 
+import com.accordiq.document.dto.request.DocumentSearchRequest;
 import com.accordiq.document.dto.response.DocumentResponse;
+import com.accordiq.document.dto.response.DocumentSearchResponse;
 import com.accordiq.document.dto.response.UploadDocumentResponse;
+import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -15,4 +18,7 @@ public interface DocumentService {
     List<DocumentResponse> getAllDocuments();
 
     DocumentResponse getDocumentById(UUID id);
+
+    Page<DocumentSearchResponse> search(DocumentSearchRequest request);
+
 }

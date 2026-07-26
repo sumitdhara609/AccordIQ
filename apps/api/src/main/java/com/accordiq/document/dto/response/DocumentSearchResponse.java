@@ -16,7 +16,7 @@ public class DocumentSearchResponse {
 
     private String contentType;
 
-    private Long size;
+    private Long fileSize;
 
     private LocalDateTime createdAt;
 }
