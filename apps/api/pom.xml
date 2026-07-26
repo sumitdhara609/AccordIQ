@@ -22,11 +22,14 @@
     <properties>
         <java.version>21</java.version>
         <lombok.version>1.18.38</lombok.version>
+        <tess4j.version>5.16.0</tess4j.version>
     </properties>
 
     <dependencies>
 
+        <!-- ========================= -->
         <!-- Spring Boot -->
+        <!-- ========================= -->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -53,7 +56,9 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
-        <!-- PostgreSQL -->
+        <!-- ========================= -->
+        <!-- Database -->
+        <!-- ========================= -->
 
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -61,7 +66,19 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- ========================= -->
+        <!-- OCR -->
+        <!-- ========================= -->
+
+        <dependency>
+            <groupId>net.sourceforge.tess4j</groupId>
+            <artifactId>tess4j</artifactId>
+            <version>${tess4j.version}</version>
+        </dependency>
+
+        <!-- ========================= -->
         <!-- Lombok -->
+        <!-- ========================= -->
 
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -70,7 +87,9 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- ========================= -->
         <!-- Testing -->
+        <!-- ========================= -->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
