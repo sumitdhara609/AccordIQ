@@ -39,6 +39,13 @@ public class AIAnalysisServiceImpl implements AIAnalysisService {
 
             String aiJson = objectMapper.writeValueAsString(analysis);
 
+            // Temporary debug logging
+            System.out.println("========== AIAnalysis ==========");
+            System.out.println(analysis);
+
+            System.out.println("========== Serialized JSON ==========");
+            System.out.println(aiJson);
+
             AIAnalysisEntity entity = AIAnalysisEntity.builder()
                     .document(document)
                     .ocrText(ocrText)
@@ -47,7 +54,14 @@ public class AIAnalysisServiceImpl implements AIAnalysisService {
                     .processingTimeMs(processingTimeMs)
                     .build();
 
-            return repository.save(entity);
+            AIAnalysisEntity savedEntity = repository.save(entity);
+
+            System.out.println("========== Saved Entity ==========");
+            System.out.println("ID          : " + savedEntity.getId());
+            System.out.println("Document ID : " + savedEntity.getDocument().getId());
+            System.out.println("AI JSON     : " + savedEntity.getAiJson());
+
+            return savedEntity;
 
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Failed to serialize AI analysis.", e);

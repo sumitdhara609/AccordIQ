@@ -39,7 +39,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Void>> handleException(
+    public ResponseEntity<ApiResponse<String>> handleException(
             Exception ex
     ) {
 
@@ -48,7 +48,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(
                         ApiResponse.failure(
-                                "An unexpected error occurred.",
+                                ex.getClass().getName() + ": " + ex.getMessage(),
                                 null
                         )
                 );
