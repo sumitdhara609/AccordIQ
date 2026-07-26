@@ -5,7 +5,15 @@ info:
 
 http:
   method: POST
-  url: ""
+  url: http://localhost:8080/api/v1/ocr/1bb10730-2599-4604-8405-74f490265488
+  body:
+    type: multipart-form
+    data:
+      - name: file
+        type: file
+        value:
+          - C:\Users\Sumit\Downloads\Deloitte.pdf
+        contentType: application/pdf
   auth: inherit
 
 settings:
