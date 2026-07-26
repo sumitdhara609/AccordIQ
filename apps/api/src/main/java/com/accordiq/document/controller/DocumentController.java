@@ -1,9 +1,12 @@
 package com.accordiq.document.controller;
 
 import com.accordiq.common.response.ApiResponse;
+import com.accordiq.document.dto.request.DocumentSearchRequest;
 import com.accordiq.document.dto.response.DocumentResponse;
+import com.accordiq.document.dto.response.DocumentSearchResponse;
 import com.accordiq.document.dto.response.UploadDocumentResponse;
 import com.accordiq.document.service.DocumentService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,6 +47,19 @@ public class DocumentController {
                 ApiResponse.success(
                         "Documents retrieved successfully.",
                         documentService.getAllDocuments()
+                )
+        );
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<Page<DocumentSearchResponse>>> searchDocuments(
+            @ModelAttribute DocumentSearchRequest request
+    ) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Documents retrieved successfully.",
+                        documentService.search(request)
                 )
         );
     }

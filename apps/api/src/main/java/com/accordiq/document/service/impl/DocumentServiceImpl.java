@@ -100,14 +100,25 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public Page<DocumentSearchResponse> search(DocumentSearchRequest request) {
 
+        int page = request.getPage() != null ? request.getPage() : 0;
+        int size = request.getSize() != null ? request.getSize() : 10;
+
+        String sortBy = request.getSortBy() != null
+                ? request.getSortBy()
+                : "createdAt";
+
+        String sortDirection = request.getSortDirection() != null
+                ? request.getSortDirection()
+                : "desc";
+
         Sort sort = Sort.by(
-                Sort.Direction.fromString(request.getSortDirection()),
-                request.getSortBy()
+                Sort.Direction.fromString(sortDirection),
+                sortBy
         );
 
         Pageable pageable = PageRequest.of(
-                request.getPage(),
-                request.getSize(),
+                page,
+                size,
                 sort
         );
 
