@@ -1,5 +1,6 @@
 package com.accordiq.common.exception;
 
+import com.accordiq.analysis.exception.AnalysisNotFoundException;
 import com.accordiq.common.response.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,21 +16,41 @@ public class GlobalExceptionHandler {
     ) {
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ApiResponse<>(
-                        false,
-                        ex.getMessage(),
-                        null
-                ));
+                .body(
+                        ApiResponse.failure(
+                                ex.getMessage(),
+                                null
+                        )
+                );
+    }
+
+    @ExceptionHandler(AnalysisNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAnalysisNotFound(
+            AnalysisNotFoundException ex
+    ) {
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(
+                        ApiResponse.failure(
+                                ex.getMessage(),
+                                null
+                        )
+                );
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Void>> handleException(Exception ex) {
+    public ResponseEntity<ApiResponse<Void>> handleException(
+            Exception ex
+    ) {
+
+        ex.printStackTrace();
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ApiResponse<>(
-                        false,
-                        ex.getMessage(),
-                        null
-                ));
+                .body(
+                        ApiResponse.failure(
+                                "An unexpected error occurred.",
+                                null
+                        )
+                );
     }
 }

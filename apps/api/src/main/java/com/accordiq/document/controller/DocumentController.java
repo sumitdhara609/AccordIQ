@@ -30,8 +30,7 @@ public class DocumentController {
         UploadDocumentResponse response = documentService.upload(file);
 
         return ResponseEntity.ok(
-                new ApiResponse<>(
-                        true,
+                ApiResponse.success(
                         "Document uploaded successfully.",
                         response
                 )
@@ -42,8 +41,7 @@ public class DocumentController {
     public ResponseEntity<ApiResponse<List<DocumentResponse>>> getAllDocuments() {
 
         return ResponseEntity.ok(
-                new ApiResponse<>(
-                        true,
+                ApiResponse.success(
                         "Documents retrieved successfully.",
                         documentService.getAllDocuments()
                 )
@@ -56,8 +54,7 @@ public class DocumentController {
     ) {
 
         return ResponseEntity.ok(
-                new ApiResponse<>(
-                        true,
+                ApiResponse.success(
                         "Document retrieved successfully.",
                         documentService.getDocumentById(id)
                 )

@@ -1,12 +1,12 @@
 package com.accordiq.ocr.service;
 
-import com.accordiq.ocr.dto.response.OCRResponse;
+import com.accordiq.document.entity.Document;
+import com.accordiq.ocr.dto.OCRResult;
 
 import java.io.IOException;
-import java.util.UUID;
 
 public interface OCRService {
 
-    OCRResponse process(UUID documentId) throws IOException;
+    OCRResult extract(Document document) throws IOException;
 
 }
