@@ -9,7 +9,16 @@ import lombok.*;
 @Table(
         name = "document_analysis",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = "document_id")
+                @UniqueConstraint(
+                        name = "uk_analysis_document",
+                        columnNames = "document_id"
+                )
+        },
+        indexes = {
+                @Index(
+                        name = "idx_analysis_document",
+                        columnList = "document_id"
+                )
         }
 )
 @Getter
@@ -17,6 +26,8 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = "document")
+@EqualsAndHashCode(callSuper = true)
 public class DocumentAnalysis extends BaseEntity {
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
