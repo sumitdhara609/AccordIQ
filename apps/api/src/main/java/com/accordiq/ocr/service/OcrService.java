@@ -1,9 +1,15 @@
 package com.accordiq.ocr.service;
 
-import java.nio.file.Path;
+import java.io.File;
 
 public interface OcrService {
 
-    String extractText(Path file);
+    /**
+     * Extract text from an image or PDF.
+     *
+     * @param file uploaded document
+     * @return extracted text
+     */
+    String extractText(File file);
 
 }

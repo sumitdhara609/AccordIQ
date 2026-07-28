@@ -111,11 +111,19 @@
 
         <!-- OCR -->
 
-        <dependency>
-            <groupId>net.sourceforge.tess4j</groupId>
-            <artifactId>tess4j</artifactId>
-            <version>${tess4j.version}</version>
-        </dependency>
+<dependency>
+    <groupId>net.sourceforge.tess4j</groupId>
+    <artifactId>tess4j</artifactId>
+    <version>${tess4j.version}</version>
+</dependency>
+
+<!-- PDF Rendering for OCR -->
+
+<dependency>
+    <groupId>org.apache.pdfbox</groupId>
+    <artifactId>pdfbox</artifactId>
+    <version>3.0.5</version>
+</dependency>
 
         <!-- OpenAPI / Swagger -->
 

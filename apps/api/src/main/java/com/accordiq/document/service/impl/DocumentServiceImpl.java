@@ -8,32 +8,30 @@ import com.accordiq.document.processing.DocumentProcessingService;
 import com.accordiq.document.repository.DocumentRepository;
 import com.accordiq.document.service.DocumentService;
 import com.accordiq.storage.service.FileStorageService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
+@Transactional
+@RequiredArgsConstructor
 public class DocumentServiceImpl implements DocumentService {
 
     private final DocumentRepository documentRepository;
     private final FileStorageService fileStorageService;
     private final DocumentProcessingService documentProcessingService;
 
-    public DocumentServiceImpl(
-            DocumentRepository documentRepository,
-            FileStorageService fileStorageService,
-            DocumentProcessingService documentProcessingService
-    ) {
-        this.documentRepository = documentRepository;
-        this.fileStorageService = fileStorageService;
-        this.documentProcessingService = documentProcessingService;
-    }
-
     @Override
     public UploadDocumentResponse upload(MultipartFile file) throws IOException {
+
+        log.info("Uploading document '{}'", file.getOriginalFilename());
 
         String storedFileName = fileStorageService.store(file);
 
@@ -43,7 +41,8 @@ public class DocumentServiceImpl implements DocumentService {
                 .contentType(file.getContentType())
                 .fileSize(file.getSize())
                 .storagePath(
-                        fileStorageService.getStorageLocation()
+                        fileStorageService
+                                .getStorageLocation()
                                 .resolve(storedFileName)
                                 .toString()
                 )
@@ -51,7 +50,11 @@ public class DocumentServiceImpl implements DocumentService {
 
         Document savedDocument = documentRepository.save(document);
 
-        // Trigger the document processing pipeline
+        log.info(
+                "Document {} stored successfully.",
+                savedDocument.getId()
+        );
+
         documentProcessingService.process(savedDocument);
 
         return new UploadDocumentResponse(
@@ -65,6 +68,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<DocumentResponse> getAllDocuments() {
 
         return documentRepository.findAll()
@@ -80,6 +84,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public DocumentResponse getDocumentById(UUID id) {
 
         Document document = documentRepository.findById(id)

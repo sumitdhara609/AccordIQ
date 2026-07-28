@@ -38,10 +38,12 @@ public class DocumentAnalysis extends BaseEntity {
     )
     private Document document;
 
-    @Lob
-    @Column(nullable = false)
-    private String rawText;
-
+    @Column(
+        name = "raw_text",
+        nullable = false,
+        columnDefinition = "TEXT"
+)
+private String rawText;
     @Column(nullable = false, length = 100)
     private String ocrEngine;
 
