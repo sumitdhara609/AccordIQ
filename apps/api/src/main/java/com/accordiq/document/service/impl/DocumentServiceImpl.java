@@ -4,6 +4,7 @@ import com.accordiq.common.exception.ResourceNotFoundException;
 import com.accordiq.document.dto.response.DocumentResponse;
 import com.accordiq.document.dto.response.UploadDocumentResponse;
 import com.accordiq.document.entity.Document;
+import com.accordiq.document.processing.DocumentProcessingService;
 import com.accordiq.document.repository.DocumentRepository;
 import com.accordiq.document.service.DocumentService;
 import com.accordiq.storage.service.FileStorageService;
@@ -19,13 +20,16 @@ public class DocumentServiceImpl implements DocumentService {
 
     private final DocumentRepository documentRepository;
     private final FileStorageService fileStorageService;
+    private final DocumentProcessingService documentProcessingService;
 
     public DocumentServiceImpl(
             DocumentRepository documentRepository,
-            FileStorageService fileStorageService
+            FileStorageService fileStorageService,
+            DocumentProcessingService documentProcessingService
     ) {
         this.documentRepository = documentRepository;
         this.fileStorageService = fileStorageService;
+        this.documentProcessingService = documentProcessingService;
     }
 
     @Override
@@ -38,12 +42,17 @@ public class DocumentServiceImpl implements DocumentService {
                 .storedFileName(storedFileName)
                 .contentType(file.getContentType())
                 .fileSize(file.getSize())
-                .storagePath(fileStorageService.getStorageLocation()
-                        .resolve(storedFileName)
-                        .toString())
+                .storagePath(
+                        fileStorageService.getStorageLocation()
+                                .resolve(storedFileName)
+                                .toString()
+                )
                 .build();
 
         Document savedDocument = documentRepository.save(document);
+
+        // Trigger the document processing pipeline
+        documentProcessingService.process(savedDocument);
 
         return new UploadDocumentResponse(
                 savedDocument.getId(),
