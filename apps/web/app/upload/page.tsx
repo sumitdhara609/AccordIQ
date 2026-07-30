@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { FileText, Upload } from "lucide-react";
+import { FileText, Loader2, Upload } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useUpload } from "@/hooks/use-upload";
@@ -13,8 +13,10 @@ export default function UploadPage() {
     selectedFile,
     error,
     isDragging,
+    isUploading,
     setIsDragging,
     selectFile,
+    upload,
   } = useUpload();
 
   function handleBrowseClick() {
@@ -32,7 +34,7 @@ export default function UploadPage() {
   }
 
   function handleDragOver(
-    event: React.DragEvent<HTMLDivElement>
+    event: React.DragEvent<HTMLElement>
   ) {
     event.preventDefault();
     setIsDragging(true);
@@ -43,7 +45,7 @@ export default function UploadPage() {
   }
 
   function handleDrop(
-    event: React.DragEvent<HTMLDivElement>
+    event: React.DragEvent<HTMLElement>
   ) {
     event.preventDefault();
 
@@ -104,6 +106,7 @@ export default function UploadPage() {
             />
 
             <Button
+              type="button"
               size="lg"
               className="mt-8"
               onClick={(event) => {
@@ -141,6 +144,25 @@ export default function UploadPage() {
                 {error}
               </p>
             )}
+
+            <Button
+              type="button"
+              className="mt-8"
+              disabled={!selectedFile || isUploading}
+              onClick={(event) => {
+                event.stopPropagation();
+                void upload();
+              }}
+            >
+              {isUploading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Uploading...
+                </>
+              ) : (
+                "Upload Document"
+              )}
+            </Button>
 
             <p className="mt-8 text-sm text-muted-foreground">
               Supported formats: PDF, PNG, JPG
