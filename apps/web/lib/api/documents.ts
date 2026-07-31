@@ -44,4 +44,13 @@ export const documentApi = {
 
     return response.data;
   },
+
+  async delete(id: string) {
+    const response =
+      await apiClient.delete<ApiResponse<void>>(
+        `/documents/${id}`
+      );
+
+    return response.data;
+  },
 };

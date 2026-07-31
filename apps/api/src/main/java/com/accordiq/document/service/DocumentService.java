@@ -15,4 +15,6 @@ public interface DocumentService {
     List<DocumentResponse> getAllDocuments();
 
     DocumentResponse getDocumentById(UUID id);
+
+    void deleteDocument(UUID id);
 }

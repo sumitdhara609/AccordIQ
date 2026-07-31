@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 
@@ -51,7 +53,7 @@ public class DocumentServiceImpl implements DocumentService {
 
         Document savedDocument = documentRepository.save(document);
 
-        // Trigger the document processing pipeline
+        // Trigger document processing
         documentProcessingService.process(savedDocument);
 
         return new UploadDocumentResponse(
@@ -96,5 +98,32 @@ public class DocumentServiceImpl implements DocumentService {
                 document.getFileSize(),
                 document.getStatus()
         );
+    }
+
+    @Override
+    public void deleteDocument(UUID id) {
+
+        Document document = documentRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Document not found with id: " + id
+                        )
+                );
+
+        try {
+
+            Path filePath = Path.of(document.getStoragePath());
+
+            Files.deleteIfExists(filePath);
+
+        } catch (IOException exception) {
+
+            throw new RuntimeException(
+                    "Failed to delete document from storage.",
+                    exception
+            );
+        }
+
+        documentRepository.delete(document);
     }
 }

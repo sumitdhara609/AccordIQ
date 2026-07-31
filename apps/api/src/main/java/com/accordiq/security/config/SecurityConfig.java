@@ -53,6 +53,11 @@ public class SecurityConfig {
                                 "/api/v1/documents/**"
                         ).permitAll()
 
+                        .requestMatchers(
+                                HttpMethod.DELETE,
+                                "/api/v1/documents/**"
+                        ).permitAll()
+
                         .anyRequest()
                         .authenticated()
                 )

@@ -63,4 +63,20 @@ public class DocumentController {
                 )
         );
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteDocument(
+            @PathVariable UUID id
+    ) {
+
+        documentService.deleteDocument(id);
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        true,
+                        "Document deleted successfully.",
+                        null
+                )
+        );
+    }
 }
