@@ -1,7 +1,8 @@
 package com.accordiq.document.processing;
 
 import com.accordiq.document.entity.Document;
-import com.accordiq.ocr.service.OcrService;
+import com.accordiq.ocr.model.OCRResult;
+import com.accordiq.ocr.service.OCRService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -15,9 +16,9 @@ public class DocumentProcessingServiceImpl
     private static final Logger LOGGER =
             LoggerFactory.getLogger(DocumentProcessingServiceImpl.class);
 
-    private final OcrService ocrService;
+    private final OCRService ocrService;
 
-    public DocumentProcessingServiceImpl(OcrService ocrService) {
+    public DocumentProcessingServiceImpl(OCRService ocrService) {
         this.ocrService = ocrService;
     }
 
@@ -29,13 +30,28 @@ public class DocumentProcessingServiceImpl
                 document.getId()
         );
 
-        String extractedText = ocrService.extractText(
+        OCRResult result = ocrService.extractText(
                 Path.of(document.getStoragePath())
         );
 
         LOGGER.info(
-                "OCR Result: {}",
-                extractedText
+                "OCR completed for document {}",
+                document.getId()
+        );
+
+        LOGGER.info(
+                "Extracted Text: {}",
+                result.getExtractedText()
+        );
+
+        LOGGER.info(
+                "Confidence: {}",
+                result.getConfidence()
+        );
+
+        LOGGER.info(
+                "Processing Time: {} ms",
+                result.getProcessingTimeMillis()
         );
     }
 }
