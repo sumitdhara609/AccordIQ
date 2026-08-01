@@ -1,9 +1,11 @@
 package com.accordiq.ocr.service;
 
+import com.accordiq.ocr.model.OCRResult;
+
 import java.nio.file.Path;
 
-public interface OcrService {
+public interface OCRService {
 
-    String extractText(Path file);
+    OCRResult extractText(Path filePath);
 
 }

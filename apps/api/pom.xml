@@ -108,6 +108,14 @@
             <artifactId>google-genai</artifactId>
             <version>${google.genai.version}</version>
         </dependency>
+         
+        <!-- PDF Processing -->
+
+<dependency>
+    <groupId>org.apache.pdfbox</groupId>
+    <artifactId>pdfbox</artifactId>
+    <version>3.0.5</version>
+</dependency>
 
         <!-- OCR -->
 
@@ -139,7 +147,7 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <!-- Testing -->
