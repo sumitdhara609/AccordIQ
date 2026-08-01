@@ -40,11 +40,6 @@ public class DocumentProcessingServiceImpl
         );
 
         LOGGER.info(
-                "Extracted Text: {}",
-                result.getExtractedText()
-        );
-
-        LOGGER.info(
                 "Confidence: {}",
                 result.getConfidence()
         );
@@ -53,5 +48,20 @@ public class DocumentProcessingServiceImpl
                 "Processing Time: {} ms",
                 result.getProcessingTimeMillis()
         );
+
+        LOGGER.debug(
+                "Extracted Text:{}{}",
+                System.lineSeparator(),
+                result.getExtractedText()
+        );
+
+        /*
+         * TODO (Feature 017)
+         *
+         * Persist extracted text.
+         * Send extracted text to Gemini.
+         * Extract structured document fields.
+         * Save AI-generated results.
+         */
     }
 }
