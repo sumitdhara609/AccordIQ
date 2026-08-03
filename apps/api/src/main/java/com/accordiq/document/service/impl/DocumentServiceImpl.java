@@ -4,6 +4,7 @@ import com.accordiq.common.exception.ResourceNotFoundException;
 import com.accordiq.document.dto.response.DocumentResponse;
 import com.accordiq.document.dto.response.UploadDocumentResponse;
 import com.accordiq.document.entity.Document;
+import com.accordiq.document.enums.DocumentStatus;
 import com.accordiq.document.processing.DocumentProcessingService;
 import com.accordiq.document.repository.DocumentRepository;
 import com.accordiq.document.service.DocumentService;
@@ -53,7 +54,6 @@ public class DocumentServiceImpl implements DocumentService {
 
         Document savedDocument = documentRepository.save(document);
 
-        // Trigger document processing
         documentProcessingService.process(savedDocument);
 
         return new UploadDocumentResponse(
@@ -69,15 +69,9 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public List<DocumentResponse> getAllDocuments() {
 
-        return documentRepository.findAll()
+        return documentRepository.findAllByOrderByCreatedAtDesc()
                 .stream()
-                .map(document -> new DocumentResponse(
-                        document.getId(),
-                        document.getOriginalFileName(),
-                        document.getContentType(),
-                        document.getFileSize(),
-                        document.getStatus()
-                ))
+                .map(this::mapToResponse)
                 .toList();
     }
 
@@ -91,13 +85,7 @@ public class DocumentServiceImpl implements DocumentService {
                         )
                 );
 
-        return new DocumentResponse(
-                document.getId(),
-                document.getOriginalFileName(),
-                document.getContentType(),
-                document.getFileSize(),
-                document.getStatus()
-        );
+        return mapToResponse(document);
     }
 
     @Override
@@ -125,5 +113,60 @@ public class DocumentServiceImpl implements DocumentService {
         }
 
         documentRepository.delete(document);
+    }
+
+    @Override
+    public List<DocumentResponse> searchDocuments(
+            String keyword,
+            DocumentStatus status
+    ) {
+
+        keyword = keyword == null ? null : keyword.trim();
+
+        List<Document> documents;
+
+        boolean hasKeyword = keyword != null && !keyword.isBlank();
+        boolean hasStatus = status != null;
+
+        if (hasKeyword && hasStatus) {
+
+            documents = documentRepository
+                    .findByOriginalFileNameContainingIgnoreCaseAndStatusOrderByCreatedAtDesc(
+                            keyword,
+                            status
+                    );
+
+        } else if (hasKeyword) {
+
+            documents = documentRepository
+                    .findByOriginalFileNameContainingIgnoreCaseOrderByCreatedAtDesc(
+                            keyword
+                    );
+
+        } else if (hasStatus) {
+
+            documents = documentRepository
+                    .findByStatusOrderByCreatedAtDesc(status);
+
+        } else {
+
+            documents = documentRepository
+                    .findAllByOrderByCreatedAtDesc();
+        }
+
+        return documents.stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    private DocumentResponse mapToResponse(Document document) {
+
+        return new DocumentResponse(
+                document.getId(),
+                document.getOriginalFileName(),
+                document.getContentType(),
+                document.getFileSize(),
+                document.getStatus()
+        );
     }
 }

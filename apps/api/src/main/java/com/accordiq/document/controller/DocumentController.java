@@ -3,6 +3,7 @@ package com.accordiq.document.controller;
 import com.accordiq.common.response.ApiResponse;
 import com.accordiq.document.dto.response.DocumentResponse;
 import com.accordiq.document.dto.response.UploadDocumentResponse;
+import com.accordiq.document.enums.DocumentStatus;
 import com.accordiq.document.service.DocumentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -60,6 +61,28 @@ public class DocumentController {
                         true,
                         "Document retrieved successfully.",
                         documentService.getDocumentById(id)
+                )
+        );
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<List<DocumentResponse>>> searchDocuments(
+
+            @RequestParam(required = false)
+            String keyword,
+
+            @RequestParam(required = false)
+            DocumentStatus status
+    ) {
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        true,
+                        "Search completed successfully.",
+                        documentService.searchDocuments(
+                                keyword,
+                                status
+                        )
                 )
         );
     }
