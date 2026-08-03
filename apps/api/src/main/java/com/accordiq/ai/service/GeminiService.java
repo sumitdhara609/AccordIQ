@@ -33,10 +33,21 @@ public class GeminiService implements AIService {
         this.objectMapper = objectMapper;
         this.promptBuilder = promptBuilder;
 
+        String apiKey = configuration.getApiKey();
+
+        if (apiKey == null || apiKey.isBlank()) {
+
+            log.warn("Gemini API key not configured. Gemini features are disabled.");
+
+            this.client = null;
+
+            return;
+        }
+
         try {
 
             this.client = Client.builder()
-                    .apiKey(configuration.getApiKey())
+                    .apiKey(apiKey)
                     .build();
 
             log.info("Gemini client initialized successfully.");
@@ -52,6 +63,12 @@ public class GeminiService implements AIService {
 
     @Override
     public String generateContent(String prompt) {
+
+        if (client == null) {
+            throw new GeminiException(
+                    "Gemini API key is not configured."
+            );
+        }
 
         try {
 
@@ -99,15 +116,9 @@ public class GeminiService implements AIService {
 
         try {
 
-            log.info(
-                    "Analysing document using Gemini."
-            );
+            String prompt = promptBuilder.build(request);
 
-            String prompt =
-                    promptBuilder.build(request);
-
-            String json =
-                    generateContent(prompt);
+            String json = generateContent(prompt);
 
             return objectMapper.readValue(
                     json,
@@ -116,16 +127,10 @@ public class GeminiService implements AIService {
 
         } catch (Exception ex) {
 
-            log.error(
-                    "Document analysis failed.",
-                    ex
-            );
-
             throw new GeminiException(
                     "Failed to analyse document.",
                     ex
             );
         }
     }
-
 }
