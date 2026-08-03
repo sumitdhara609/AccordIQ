@@ -1,5 +1,9 @@
 package com.accordiq.document.processing;
 
+import com.accordiq.ai.dto.request.DocumentAnalysisRequest;
+import com.accordiq.ai.dto.response.DocumentAnalysisResponse;
+import com.accordiq.ai.dto.response.ExtractedField;
+import com.accordiq.ai.service.AIService;
 import com.accordiq.document.entity.Document;
 import com.accordiq.ocr.model.OCRResult;
 import com.accordiq.ocr.service.OCRService;
@@ -17,9 +21,14 @@ public class DocumentProcessingServiceImpl
             LoggerFactory.getLogger(DocumentProcessingServiceImpl.class);
 
     private final OCRService ocrService;
+    private final AIService aiService;
 
-    public DocumentProcessingServiceImpl(OCRService ocrService) {
+    public DocumentProcessingServiceImpl(
+            OCRService ocrService,
+            AIService aiService
+    ) {
         this.ocrService = ocrService;
+        this.aiService = aiService;
     }
 
     @Override
@@ -30,7 +39,7 @@ public class DocumentProcessingServiceImpl
                 document.getId()
         );
 
-        OCRResult result = ocrService.extractText(
+        OCRResult ocrResult = ocrService.extractText(
                 Path.of(document.getStoragePath())
         );
 
@@ -40,28 +49,78 @@ public class DocumentProcessingServiceImpl
         );
 
         LOGGER.info(
-                "Confidence: {}",
-                result.getConfidence()
+                "OCR Confidence: {}",
+                ocrResult.getConfidence()
         );
 
         LOGGER.info(
-                "Processing Time: {} ms",
-                result.getProcessingTimeMillis()
+                "OCR Processing Time: {} ms",
+                ocrResult.getProcessingTimeMillis()
         );
 
         LOGGER.debug(
                 "Extracted Text:{}{}",
                 System.lineSeparator(),
-                result.getExtractedText()
+                ocrResult.getExtractedText()
         );
 
+        DocumentAnalysisRequest request =
+                DocumentAnalysisRequest.builder()
+                        .documentId(document.getId().toString())
+                        .documentType("UNKNOWN")
+                        .extractedText(
+                                ocrResult.getExtractedText()
+                        )
+                        .build();
+
+        LOGGER.info(
+                "Sending document {} to Gemini.",
+                document.getId()
+        );
+
+        DocumentAnalysisResponse response =
+                aiService.analyzeDocument(request);
+
+        LOGGER.info(
+                "AI document analysis completed."
+        );
+
+        LOGGER.info(
+                "Detected document type: {}",
+                response.getDocumentType()
+        );
+
+        LOGGER.info(
+                "Summary: {}",
+                response.getSummary()
+        );
+
+        if (response.getFields() != null) {
+
+            LOGGER.info(
+                    "Extracted {} fields.",
+                    response.getFields().size()
+            );
+
+            for (ExtractedField field : response.getFields()) {
+
+                LOGGER.info(
+                        "{} = {} (confidence={})",
+                        field.getName(),
+                        field.getValue(),
+                        field.getConfidence()
+                );
+            }
+        }
+
         /*
-         * TODO (Feature 017)
+         * Feature 019
          *
-         * Persist extracted text.
-         * Send extracted text to Gemini.
-         * Extract structured document fields.
-         * Save AI-generated results.
+         * Persist AI analysis.
+         * Persist extracted fields.
+         * Update document status.
+         * Enable search indexing.
          */
+
     }
 }
