@@ -4,8 +4,15 @@ info:
   seq: 1
 
 http:
-  method: POST
-  url: ""
+  method: GET
+  url: http://localhost:8080/api/v1/documents/search?keyword=test&status=UPLOADED
+  params:
+    - name: keyword
+      value: test
+      type: query
+    - name: status
+      value: UPLOADED
+      type: query
   auth: inherit
 
 settings:
