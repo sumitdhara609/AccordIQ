@@ -7,9 +7,7 @@ export default function useAnalyze() {
   const [mode, setMode] = useState<AnalyzeMode>("upload");
 
   const [file, setFile] = useState<File | null>(null);
-
   const [text, setText] = useState("");
-
   const [url, setUrl] = useState("");
 
   const [loading, setLoading] = useState(false);
@@ -23,13 +21,7 @@ export default function useAnalyze() {
         return text.trim().length > 0;
 
       case "url":
-        try {
-          if (!url.trim()) return false;
-          new URL(url);
-          return true;
-        } catch {
-          return false;
-        }
+        return url.trim().length > 0;
 
       default:
         return false;
@@ -41,6 +33,7 @@ export default function useAnalyze() {
     setText("");
     setUrl("");
     setLoading(false);
+    setMode("upload");
   }
 
   return {
