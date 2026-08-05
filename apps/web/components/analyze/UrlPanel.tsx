@@ -11,14 +11,33 @@ export default function UrlPanel({
   url,
   setUrl,
 }: UrlPanelProps) {
-  const isValid = useMemo(() => {
-    if (!url.trim()) return true;
+  const validation = useMemo(() => {
+    if (!url.trim()) {
+      return {
+        valid: true,
+        message: "",
+      };
+    }
 
     try {
-      new URL(url);
-      return true;
+      const parsed = new URL(url);
+
+      if (!["http:", "https:"].includes(parsed.protocol)) {
+        return {
+          valid: false,
+          message: "Only HTTP and HTTPS URLs are supported.",
+        };
+      }
+
+      return {
+        valid: true,
+        message: "Looks good.",
+      };
     } catch {
-      return false;
+      return {
+        valid: false,
+        message: "Please enter a valid URL.",
+      };
     }
   }, [url]);
 
@@ -28,15 +47,35 @@ export default function UrlPanel({
         type="url"
         value={url}
         onChange={(e) => setUrl(e.target.value)}
-        placeholder="https://example.com"
-        className="w-full rounded-xl border p-4 outline-none focus:ring-2 focus:ring-black"
+        placeholder="https://example.com/article"
+        className={`w-full rounded-2xl border p-5 outline-none transition ${
+          validation.valid
+            ? "border-gray-300 focus:border-black"
+            : "border-red-500 focus:border-red-500"
+        }`}
       />
 
-      {!isValid && (
-        <p className="text-sm text-red-500">
-          Please enter a valid URL.
-        </p>
-      )}
+      <div className="flex items-center justify-between text-sm">
+        <span
+          className={
+            validation.valid
+              ? "text-green-600"
+              : "text-red-500"
+          }
+        >
+          {validation.message}
+        </span>
+
+        {url && (
+          <button
+            type="button"
+            onClick={() => setUrl("")}
+            className="rounded-lg border px-3 py-1 hover:bg-gray-100"
+          >
+            Clear
+          </button>
+        )}
+      </div>
     </div>
   );
 }

@@ -28,20 +28,19 @@ export default function AnalyzeButton({
     analyze.setLoading(true);
 
     try {
-      const response = await analyzeService.analyze({
+      const result = await analyzeService.analyze({
         type: analyze.mode,
         file: analyze.file,
         text: analyze.text,
         url: analyze.url,
       });
 
-      console.log("Analysis Result:", response);
+      console.log(result);
 
-      // We'll replace this with the results page in Sprint 3.
-      alert(response.summary);
+      alert(result.summary);
     } catch (error) {
       console.error(error);
-      alert("Analysis failed.");
+      alert("Unable to analyze the content.");
     } finally {
       analyze.setLoading(false);
     }
@@ -52,9 +51,35 @@ export default function AnalyzeButton({
       type="button"
       onClick={handleAnalyze}
       disabled={!analyze.canAnalyze || analyze.loading}
-      className="rounded-xl bg-black px-8 py-3 text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
+      className="inline-flex min-w-[220px] items-center justify-center rounded-xl bg-black px-8 py-3 text-base font-semibold text-white transition-all duration-200 hover:scale-[1.02] hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
     >
-      {analyze.loading ? "Analyzing..." : "Analyze"}
+      {analyze.loading ? (
+        <>
+          <svg
+            className="mr-2 h-5 w-5 animate-spin"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="3"
+              opacity="0.25"
+            />
+            <path
+              d="M22 12a10 10 0 0 1-10 10"
+              stroke="currentColor"
+              strokeWidth="3"
+            />
+          </svg>
+
+          Analyzing...
+        </>
+      ) : (
+        "Analyze Document"
+      )}
     </button>
   );
 }
