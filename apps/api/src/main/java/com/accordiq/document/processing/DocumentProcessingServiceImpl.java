@@ -5,6 +5,10 @@ import com.accordiq.ai.dto.response.DocumentAnalysisResponse;
 import com.accordiq.ai.dto.response.ExtractedField;
 import com.accordiq.ai.service.AIService;
 import com.accordiq.document.entity.Document;
+import com.accordiq.document.enums.DocumentStatus;
+import com.accordiq.documentanalysis.entity.DocumentAnalysis;
+import com.accordiq.documentanalysis.service.DocumentAnalysisService;
+import com.accordiq.documentfield.service.DocumentFieldService;
 import com.accordiq.ocr.model.OCRResult;
 import com.accordiq.ocr.service.OCRService;
 import org.slf4j.Logger;
@@ -21,18 +25,27 @@ public class DocumentProcessingServiceImpl
             LoggerFactory.getLogger(DocumentProcessingServiceImpl.class);
 
     private final OCRService ocrService;
+
     private final AIService aiService;
+
+    private final DocumentAnalysisService documentAnalysisService;
+
+    private final DocumentFieldService documentFieldService;
 
     public DocumentProcessingServiceImpl(
             OCRService ocrService,
-            AIService aiService
+            AIService aiService,
+            DocumentAnalysisService documentAnalysisService,
+            DocumentFieldService documentFieldService
     ) {
         this.ocrService = ocrService;
         this.aiService = aiService;
+        this.documentAnalysisService = documentAnalysisService;
+        this.documentFieldService = documentFieldService;
     }
 
     @Override
-    public void process(Document document) {
+    public DocumentAnalysisResponse process(Document document) {
 
         LOGGER.info(
                 "Processing started for document {}",
@@ -114,13 +127,39 @@ public class DocumentProcessingServiceImpl
         }
 
         /*
-         * Feature 019
-         *
          * Persist AI analysis.
-         * Persist extracted fields.
-         * Update document status.
-         * Enable search indexing.
          */
+        DocumentAnalysis analysis =
+                documentAnalysisService.saveAnalysis(
+                        document,
+                        response
+                );
 
+        /*
+         * Persist extracted fields.
+         */
+        documentFieldService.saveFields(
+                analysis,
+                response
+        );
+
+        /*
+         * Temporary status update.
+         *
+         * The document is intentionally NOT saved here.
+         * A later feature will wrap:
+         *
+         * - AI Analysis
+         * - Extracted Fields
+         * - Document Status
+         *
+         * inside a single database transaction.
+         */
+        document.setStatus(
+                DocumentStatus.COMPLETED
+        );
+
+        return response;
     }
+
 }

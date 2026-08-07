@@ -1,7 +1,7 @@
 package com.accordiq.document.service;
 
 import com.accordiq.document.dto.response.DocumentResponse;
-import com.accordiq.document.dto.response.UploadDocumentResponse;
+import com.accordiq.document.dto.response.UploadAnalysisResponse;
 import com.accordiq.document.enums.DocumentStatus;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public interface DocumentService {
 
-    UploadDocumentResponse upload(MultipartFile file) throws IOException;
+    UploadAnalysisResponse upload(MultipartFile file) throws IOException;
 
     List<DocumentResponse> getAllDocuments();
 

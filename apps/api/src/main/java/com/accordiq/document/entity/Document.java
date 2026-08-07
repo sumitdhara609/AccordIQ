@@ -33,4 +33,5 @@ public class Document extends BaseEntity {
     @Column(nullable = false)
     @Builder.Default
     private DocumentStatus status = DocumentStatus.UPLOADED;
+
 }

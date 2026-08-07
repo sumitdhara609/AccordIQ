@@ -1,7 +1,9 @@
 package com.accordiq.document.service.impl;
 
+import com.accordiq.ai.dto.response.DocumentAnalysisResponse;
 import com.accordiq.common.exception.ResourceNotFoundException;
 import com.accordiq.document.dto.response.DocumentResponse;
+import com.accordiq.document.dto.response.UploadAnalysisResponse;
 import com.accordiq.document.dto.response.UploadDocumentResponse;
 import com.accordiq.document.entity.Document;
 import com.accordiq.document.enums.DocumentStatus;
@@ -36,7 +38,8 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public UploadDocumentResponse upload(MultipartFile file) throws IOException {
+    public UploadAnalysisResponse upload(MultipartFile file)
+            throws IOException {
 
         String storedFileName = fileStorageService.store(file);
 
@@ -46,30 +49,40 @@ public class DocumentServiceImpl implements DocumentService {
                 .contentType(file.getContentType())
                 .fileSize(file.getSize())
                 .storagePath(
-                        fileStorageService.getStorageLocation()
+                        fileStorageService
+                                .getStorageLocation()
                                 .resolve(storedFileName)
                                 .toString()
                 )
                 .build();
 
-        Document savedDocument = documentRepository.save(document);
+        Document savedDocument =
+                documentRepository.save(document);
 
-        documentProcessingService.process(savedDocument);
+        DocumentAnalysisResponse analysis =
+                documentProcessingService.process(savedDocument);
 
-        return new UploadDocumentResponse(
-                savedDocument.getId(),
-                savedDocument.getOriginalFileName(),
-                savedDocument.getStoredFileName(),
-                savedDocument.getContentType(),
-                savedDocument.getFileSize(),
-                savedDocument.getStatus().name()
+        UploadDocumentResponse upload =
+                new UploadDocumentResponse(
+                        savedDocument.getId(),
+                        savedDocument.getOriginalFileName(),
+                        savedDocument.getStoredFileName(),
+                        savedDocument.getContentType(),
+                        savedDocument.getFileSize(),
+                        savedDocument.getStatus().name()
+                );
+
+        return new UploadAnalysisResponse(
+                upload,
+                analysis
         );
     }
 
     @Override
     public List<DocumentResponse> getAllDocuments() {
 
-        return documentRepository.findAllByOrderByCreatedAtDesc()
+        return documentRepository
+                .findAllByOrderByCreatedAtDesc()
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -78,12 +91,13 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public DocumentResponse getDocumentById(UUID id) {
 
-        Document document = documentRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Document not found with id: " + id
-                        )
-                );
+        Document document =
+                documentRepository.findById(id)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Document not found with id: " + id
+                                )
+                        );
 
         return mapToResponse(document);
     }
@@ -91,16 +105,18 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public void deleteDocument(UUID id) {
 
-        Document document = documentRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Document not found with id: " + id
-                        )
-                );
+        Document document =
+                documentRepository.findById(id)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Document not found with id: " + id
+                                )
+                        );
 
         try {
 
-            Path filePath = Path.of(document.getStoragePath());
+            Path filePath =
+                    Path.of(document.getStoragePath());
 
             Files.deleteIfExists(filePath);
 
@@ -121,37 +137,49 @@ public class DocumentServiceImpl implements DocumentService {
             DocumentStatus status
     ) {
 
-        keyword = keyword == null ? null : keyword.trim();
+        keyword =
+                keyword == null
+                        ? null
+                        : keyword.trim();
 
         List<Document> documents;
 
-        boolean hasKeyword = keyword != null && !keyword.isBlank();
-        boolean hasStatus = status != null;
+        boolean hasKeyword =
+                keyword != null && !keyword.isBlank();
+
+        boolean hasStatus =
+                status != null;
 
         if (hasKeyword && hasStatus) {
 
-            documents = documentRepository
-                    .findByOriginalFileNameContainingIgnoreCaseAndStatusOrderByCreatedAtDesc(
-                            keyword,
-                            status
-                    );
+            documents =
+                    documentRepository
+                            .findByOriginalFileNameContainingIgnoreCaseAndStatusOrderByCreatedAtDesc(
+                                    keyword,
+                                    status
+                            );
 
         } else if (hasKeyword) {
 
-            documents = documentRepository
-                    .findByOriginalFileNameContainingIgnoreCaseOrderByCreatedAtDesc(
-                            keyword
-                    );
+            documents =
+                    documentRepository
+                            .findByOriginalFileNameContainingIgnoreCaseOrderByCreatedAtDesc(
+                                    keyword
+                            );
 
         } else if (hasStatus) {
 
-            documents = documentRepository
-                    .findByStatusOrderByCreatedAtDesc(status);
+            documents =
+                    documentRepository
+                            .findByStatusOrderByCreatedAtDesc(
+                                    status
+                            );
 
         } else {
 
-            documents = documentRepository
-                    .findAllByOrderByCreatedAtDesc();
+            documents =
+                    documentRepository
+                            .findAllByOrderByCreatedAtDesc();
         }
 
         return documents.stream()
@@ -159,7 +187,9 @@ public class DocumentServiceImpl implements DocumentService {
                 .toList();
     }
 
-    private DocumentResponse mapToResponse(Document document) {
+    private DocumentResponse mapToResponse(
+            Document document
+    ) {
 
         return new DocumentResponse(
                 document.getId(),

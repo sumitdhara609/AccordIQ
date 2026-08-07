@@ -36,12 +36,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
 
                         .requestMatchers(
-                                "/api/v1/auth/**",
-                                "/api/v1/ai/**",
-                                "/v3/api-docs/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/actuator/health"
+        "/api/v1/auth/**",
+        "/api/v1/ai/**",
+        "/api/v1/analyze/**",
+        "/v3/api-docs/**",
+        "/swagger-ui/**",
+        "/swagger-ui.html",
+        "/actuator/health"
                         ).permitAll()
 
                         .requestMatchers(
@@ -50,14 +51,8 @@ public class SecurityConfig {
                         ).permitAll()
 
                         .requestMatchers(
-                                HttpMethod.GET,
-                                "/api/v1/documents/**"
-                        ).permitAll()
-
-                        .requestMatchers(
-                                HttpMethod.DELETE,
-                                "/api/v1/documents/**"
-                        ).permitAll()
+        "/api/v1/documents/**"
+).permitAll()
 
                         .anyRequest()
                         .authenticated()
