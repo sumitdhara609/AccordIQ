@@ -19,4 +19,9 @@ public interface DocumentFieldRepository
             UUID analysisId
     );
 
+    List<DocumentField>
+    findByFieldValueContainingIgnoreCase(
+            String value
+    );
+
 }
