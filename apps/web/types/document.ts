@@ -1,7 +1,9 @@
 export type DocumentStatus =
   | "UPLOADED"
   | "PROCESSING"
-  | "PROCESSED"
+  | "OCR_COMPLETED"
+  | "REVIEW_REQUIRED"
+  | "COMPLETED"
   | "FAILED";
 
 export interface UploadDocumentResponse {
