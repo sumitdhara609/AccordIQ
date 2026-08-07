@@ -1,38 +1,36 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 
 import { ThemeProvider } from "@/providers/theme-provider";
 
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://accordiq.app"),
   title: {
     default: "AccordIQ",
     template: "%s | AccordIQ",
   },
   description:
-    "AI-powered document intelligence platform for OCR, extraction, validation, and review.",
+    "AI-powered document intelligence platform for OCR, AI extraction, validation, and document understanding.",
   applicationName: "AccordIQ",
   keywords: [
     "AccordIQ",
     "OCR",
-    "AI",
+    "Artificial Intelligence",
     "Document Intelligence",
-    "Document Processing",
-    "Invoice Extraction",
-    "Receipt OCR",
     "Spring Boot",
     "Next.js",
+    "Gemini",
+    "Tesseract",
+    "Invoice OCR",
+    "Receipt OCR",
   ],
   authors: [
     {
@@ -47,9 +45,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      suppressHydrationWarning
+    >
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${inter.variable} min-h-screen font-sans antialiased`}
       >
         <ThemeProvider>
           {children}

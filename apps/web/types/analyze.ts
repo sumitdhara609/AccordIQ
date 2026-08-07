@@ -8,9 +8,8 @@ export interface AnalyzeRequest {
 }
 
 export interface AnalyzeResponse {
-  success: boolean;
   summary: string;
-  confidence: number;
+  keyPoints: string[];
   risks: string[];
   recommendations: string[];
 }

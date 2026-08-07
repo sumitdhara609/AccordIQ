@@ -1,9 +1,10 @@
+import AppLayout from "@/components/layout/AppLayout";
+import DashboardShell from "@/components/dashboard/dashboard-shell";
+
 export default function DashboardPage() {
-    return (
-        <main className="flex min-h-screen items-center justify-center">
-            <h1 className="text-3xl font-bold">
-                Dashboard
-            </h1>
-        </main>
-    );
+  return (
+    <AppLayout>
+      <DashboardShell />
+    </AppLayout>
+  );
 }

@@ -4,15 +4,14 @@ info:
   seq: 1
 
 http:
-  method: GET
-  url: http://localhost:8080/api/v1/documents/search?keyword=test&status=UPLOADED
-  params:
-    - name: keyword
-      value: test
-      type: query
-    - name: status
-      value: UPLOADED
-      type: query
+  method: POST
+  url: http://localhost:8080/api/v1/analyze/text
+  body:
+    type: json
+    data: |-
+      {
+        "text": "This agreement automatically renews every year unless cancelled with 30 days notice."
+      }
   auth: inherit
 
 settings:

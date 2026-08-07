@@ -1,10 +1,5 @@
-import { AppShell } from "@/components/layout/app-shell";
-import { Hero } from "@/components/landing/hero";
+import AnalyzeWorkspace from "@/components/analyze/AnalyzeWorkspace";
 
-export default function Home() {
-  return (
-    <AppShell>
-      <Hero />
-    </AppShell>
-  );
+export default function AnalyzePage() {
+  return <AnalyzeWorkspace />;
 }

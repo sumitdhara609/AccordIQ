@@ -2,21 +2,36 @@
 
 import { useRef } from "react";
 
+import {
+  FileText,
+  Trash2,
+  UploadCloud,
+} from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+} from "@/components/ui/card";
+
 interface UploadPanelProps {
   file: File | null;
   setFile: (file: File | null) => void;
 }
 
-const ACCEPTED_TYPES = ".pdf,.doc,.docx,.png,.jpg,.jpeg,.txt";
+const ACCEPTED_TYPES =
+  ".pdf,.doc,.docx,.png,.jpg,.jpeg,.txt";
 
 export default function UploadPanel({
   file,
   setFile,
 }: UploadPanelProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef =
+    useRef<HTMLInputElement>(null);
 
   function handleFile(file: File | null) {
     if (!file) return;
+
     setFile(file);
   }
 
@@ -26,13 +41,19 @@ export default function UploadPanel({
     handleFile(event.target.files?.[0] ?? null);
   }
 
-  function onDrop(event: React.DragEvent<HTMLDivElement>) {
+  function onDrop(
+    event: React.DragEvent<HTMLDivElement>
+  ) {
     event.preventDefault();
 
-    handleFile(event.dataTransfer.files?.[0] ?? null);
+    handleFile(
+      event.dataTransfer.files?.[0] ?? null
+    );
   }
 
-  function onDragOver(event: React.DragEvent<HTMLDivElement>) {
+  function onDragOver(
+    event: React.DragEvent<HTMLDivElement>
+  ) {
     event.preventDefault();
   }
 
@@ -45,57 +66,94 @@ export default function UploadPanel({
   }
 
   return (
-    <div className="space-y-6">
-      <div
+    <div className="space-y-8">
+
+      <Card
+        className="cursor-pointer border-2 border-dashed border-border hover:border-primary"
+        onClick={() =>
+          inputRef.current?.click()
+        }
         onDrop={onDrop}
         onDragOver={onDragOver}
-        onClick={() => inputRef.current?.click()}
-        className="cursor-pointer rounded-2xl border-2 border-dashed p-12 text-center transition hover:border-black hover:bg-gray-50"
       >
-        <input
-          ref={inputRef}
-          hidden
-          type="file"
-          accept={ACCEPTED_TYPES}
-          onChange={onInputChange}
-        />
+        <CardContent className="flex flex-col items-center justify-center py-20 text-center">
 
-        <div className="space-y-3">
-          <div className="text-5xl">📄</div>
+          <input
+            hidden
+            ref={inputRef}
+            type="file"
+            accept={ACCEPTED_TYPES}
+            onChange={onInputChange}
+          />
 
-          <h3 className="text-xl font-semibold">
-            Upload a document
-          </h3>
-
-          <p className="text-sm text-gray-500">
-            Drag & drop your file here or click to browse
-          </p>
-
-          <p className="text-xs text-gray-400">
-            PDF • DOCX • JPG • PNG • TXT
-          </p>
-        </div>
-      </div>
-
-      {file && (
-        <div className="flex items-center justify-between rounded-xl border p-4">
-          <div>
-            <p className="font-medium">{file.name}</p>
-
-            <p className="text-sm text-gray-500">
-              {(file.size / 1024).toFixed(2)} KB
-            </p>
+          <div className="mb-6 rounded-2xl bg-primary/10 p-5">
+            <UploadCloud className="h-10 w-10 text-primary" />
           </div>
 
-          <button
+          <h3 className="text-2xl font-semibold">
+            Upload your document
+          </h3>
+
+          <p className="mt-3 max-w-md text-muted-foreground">
+            Drag & drop your document here or browse
+            your computer to begin AI analysis.
+          </p>
+
+          <Button
             type="button"
-            onClick={removeFile}
-            className="rounded-lg border px-4 py-2 hover:bg-gray-100"
+            variant="premium"
+            className="mt-8"
           >
-            Remove
-          </button>
-        </div>
+            Browse Files
+          </Button>
+
+          <p className="mt-6 text-sm text-muted-foreground">
+            Supports PDF, DOCX, PNG, JPG and TXT
+          </p>
+
+        </CardContent>
+      </Card>
+
+      {file && (
+
+        <Card>
+
+          <CardContent className="flex items-center justify-between p-6">
+
+            <div className="flex items-center gap-4">
+
+              <div className="rounded-xl bg-primary/10 p-3">
+                <FileText className="h-6 w-6 text-primary" />
+              </div>
+
+              <div>
+
+                <p className="font-medium">
+                  {file.name}
+                </p>
+
+                <p className="text-sm text-muted-foreground">
+                  {(file.size / 1024).toFixed(2)} KB
+                </p>
+
+              </div>
+
+            </div>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={removeFile}
+            >
+              <Trash2 className="h-5 w-5" />
+            </Button>
+
+          </CardContent>
+
+        </Card>
+
       )}
+
     </div>
   );
 }
