@@ -13,13 +13,17 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://accordiq.app"),
+
   title: {
     default: "AccordIQ",
     template: "%s | AccordIQ",
   },
+
   description:
     "AI-powered document intelligence platform for OCR, AI extraction, validation, and document understanding.",
+
   applicationName: "AccordIQ",
+
   keywords: [
     "AccordIQ",
     "OCR",
@@ -32,6 +36,7 @@ export const metadata: Metadata = {
     "Invoice OCR",
     "Receipt OCR",
   ],
+
   authors: [
     {
       name: "Sumit Dhara",
@@ -45,10 +50,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      suppressHydrationWarning
-    >
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${inter.variable} min-h-screen font-sans antialiased`}
       >
