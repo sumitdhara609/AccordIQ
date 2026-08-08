@@ -1,4 +1,4 @@
-﻿# ==========================================================
+# ==========================================================
 # Build stage
 # ==========================================================
 
@@ -22,11 +22,7 @@ FROM eclipse-temurin:21-jre-jammy
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        tesseract-ocr \
-        tesseract-ocr-eng \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-eng && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
