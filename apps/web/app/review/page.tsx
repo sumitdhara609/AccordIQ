@@ -1,95 +1,39 @@
-"use client";
-
-import { useMemo } from "react";
-
-import { ExportMenu } from "@/components/export/ExportMenu";
-import { ReviewActions } from "@/components/review/ReviewActions";
-import { ReviewEmptyState } from "@/components/review/ReviewEmptyState";
-import { ReviewFieldList } from "@/components/review/ReviewFieldList";
-import { ReviewHeader } from "@/components/review/ReviewHeader";
-import { ReviewLoading } from "@/components/review/ReviewLoading";
-import { useReview } from "@/hooks/useReview";
+import Link from "next/link";
 
 export default function ReviewPage() {
-  /*
-   * Temporary document id.
-   *
-   * The review route will be connected to the
-   * selected document in the next integration step.
-   */
-  const documentId = "demo";
-
-  const {
-    review,
-    loading,
-    error,
-  } = useReview(documentId);
-
-  const documentName = useMemo(() => {
-    return review?.documentName ?? "Unknown Document";
-  }, [review]);
-
-  if (loading) {
-    return (
-      <main className="mx-auto max-w-5xl px-6 py-10">
-        <ReviewLoading />
-      </main>
-    );
-  }
-
-  if (error || !review) {
-    return (
-      <main className="mx-auto max-w-5xl px-6 py-10">
-        <ReviewEmptyState />
-      </main>
-    );
-  }
-
   return (
-    <main className="mx-auto max-w-5xl space-y-8 px-6 py-10">
-      <ReviewHeader
-        documentName={documentName}
-      />
+    <main className="mx-auto flex min-h-screen max-w-5xl items-center justify-center px-6 py-10">
+      <section className="w-full max-w-xl rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
+        <h1 className="text-2xl font-semibold text-gray-900">
+          Document Review
+        </h1>
 
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h2 className="text-xl font-semibold text-gray-900">
-            Extracted Data
-          </h2>
+        <p className="mt-3 text-sm leading-6 text-gray-500">
+          Select a document from your document library to begin the review
+          workflow.
+        </p>
 
-          <p className="mt-1 text-sm text-gray-500">
-            Verify the AI-generated fields before approval.
-          </p>
-        </div>
-
-        <ExportMenu
-          document={{
-            id: review.documentId,
-            fileName: review.documentName,
-            status: review.status,
-            fields: review.fields.map(
-              (field) => ({
-                name: field.name,
-                value: field.value,
-                confidence: field.confidence,
-              })
-            ),
-          }}
-        />
-      </div>
-
-      <ReviewFieldList
-        fields={review.fields}
-      />
-
-      <ReviewActions
-        onApprove={() => {
-          console.log("Approve");
-        }}
-        onReject={() => {
-          console.log("Reject");
-        }}
-      />
+        <Link
+          href="/documents"
+          className="
+            mt-6
+            inline-flex
+            items-center
+            justify-center
+            rounded-xl
+            bg-gray-900
+            px-5
+            py-3
+            text-sm
+            font-semibold
+            text-white
+            transition
+            hover:bg-gray-800
+          "
+        >
+          Go to Documents
+        </Link>
+      </section>
     </main>
   );
 }

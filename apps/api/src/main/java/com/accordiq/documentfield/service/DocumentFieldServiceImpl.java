@@ -11,6 +11,8 @@ import com.accordiq.documentfield.repository.DocumentFieldRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 @Transactional
 public class DocumentFieldServiceImpl
@@ -32,10 +34,12 @@ public class DocumentFieldServiceImpl
 
         if (response.getFields() == null ||
                 response.getFields().isEmpty()) {
+
             return;
         }
 
-        for (ExtractedField extractedField : response.getFields()) {
+        for (ExtractedField extractedField :
+                response.getFields()) {
 
             DocumentField field =
                     DocumentField.builder()
@@ -57,7 +61,7 @@ public class DocumentFieldServiceImpl
 
     @Override
     public DocumentFieldResponse updateField(
-            java.util.UUID fieldId,
+            UUID fieldId,
             UpdateFieldRequest request
     ) {
 
@@ -87,7 +91,5 @@ public class DocumentFieldServiceImpl
                 field.getConfidence()
 
         );
-
     }
-
 }
