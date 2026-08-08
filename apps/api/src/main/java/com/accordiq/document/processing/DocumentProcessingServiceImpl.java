@@ -14,6 +14,7 @@ import com.accordiq.ocr.service.OCRService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.Path;
 
@@ -25,11 +26,8 @@ public class DocumentProcessingServiceImpl
             LoggerFactory.getLogger(DocumentProcessingServiceImpl.class);
 
     private final OCRService ocrService;
-
     private final AIService aiService;
-
     private final DocumentAnalysisService documentAnalysisService;
-
     private final DocumentFieldService documentFieldService;
 
     public DocumentProcessingServiceImpl(
@@ -45,6 +43,7 @@ public class DocumentProcessingServiceImpl
     }
 
     @Override
+    @Transactional
     public DocumentAnalysisResponse process(Document document) {
 
         LOGGER.info(
@@ -52,114 +51,125 @@ public class DocumentProcessingServiceImpl
                 document.getId()
         );
 
-        OCRResult ocrResult = ocrService.extractText(
-                Path.of(document.getStoragePath())
-        );
+        document.setStatus(DocumentStatus.PROCESSING);
 
-        LOGGER.info(
-                "OCR completed for document {}",
-                document.getId()
-        );
-
-        LOGGER.info(
-                "OCR Confidence: {}",
-                ocrResult.getConfidence()
-        );
-
-        LOGGER.info(
-                "OCR Processing Time: {} ms",
-                ocrResult.getProcessingTimeMillis()
-        );
-
-        LOGGER.debug(
-                "Extracted Text:{}{}",
-                System.lineSeparator(),
-                ocrResult.getExtractedText()
-        );
-
-        DocumentAnalysisRequest request =
-                DocumentAnalysisRequest.builder()
-                        .documentId(document.getId().toString())
-                        .documentType("UNKNOWN")
-                        .extractedText(
-                                ocrResult.getExtractedText()
-                        )
-                        .build();
-
-        LOGGER.info(
-                "Sending document {} to Gemini.",
-                document.getId()
-        );
-
-        DocumentAnalysisResponse response =
-                aiService.analyzeDocument(request);
-
-        LOGGER.info(
-                "AI document analysis completed."
-        );
-
-        LOGGER.info(
-                "Detected document type: {}",
-                response.getDocumentType()
-        );
-
-        LOGGER.info(
-                "Summary: {}",
-                response.getSummary()
-        );
-
-        if (response.getFields() != null) {
+        try {
+            OCRResult ocrResult =
+                    ocrService.extractText(
+                            Path.of(document.getStoragePath())
+                    );
 
             LOGGER.info(
-                    "Extracted {} fields.",
-                    response.getFields().size()
+                    "OCR completed for document {}",
+                    document.getId()
             );
 
-            for (ExtractedField field : response.getFields()) {
+            LOGGER.info(
+                    "OCR Confidence: {}",
+                    ocrResult.getConfidence()
+            );
 
+            LOGGER.info(
+                    "OCR Processing Time: {} ms",
+                    ocrResult.getProcessingTimeMillis()
+            );
+
+            LOGGER.debug(
+                    "Extracted Text:{}{}",
+                    System.lineSeparator(),
+                    ocrResult.getExtractedText()
+            );
+
+            document.setStatus(
+                    DocumentStatus.OCR_COMPLETED
+            );
+
+            DocumentAnalysisRequest request =
+                    DocumentAnalysisRequest.builder()
+                            .documentId(
+                                    document.getId().toString()
+                            )
+                            .documentType("UNKNOWN")
+                            .extractedText(
+                                    ocrResult.getExtractedText()
+                            )
+                            .build();
+
+            LOGGER.info(
+                    "Sending document {} to Gemini.",
+                    document.getId()
+            );
+
+            DocumentAnalysisResponse response =
+                    aiService.analyzeDocument(request);
+
+            LOGGER.info(
+                    "AI document analysis completed."
+            );
+
+            LOGGER.info(
+                    "Detected document type: {}",
+                    response.getDocumentType()
+            );
+
+            LOGGER.info(
+                    "Summary: {}",
+                    response.getSummary()
+            );
+
+            if (response.getFields() != null) {
                 LOGGER.info(
-                        "{} = {} (confidence={})",
-                        field.getName(),
-                        field.getValue(),
-                        field.getConfidence()
+                        "Extracted {} fields.",
+                        response.getFields().size()
                 );
+
+                for (ExtractedField field :
+                        response.getFields()) {
+
+                    LOGGER.info(
+                            "{} = {} (confidence={})",
+                            field.getName(),
+                            field.getValue(),
+                            field.getConfidence()
+                    );
+                }
             }
+
+            DocumentAnalysis analysis =
+                    documentAnalysisService.saveAnalysis(
+                            document,
+                            response
+                    );
+
+            documentFieldService.saveFields(
+                    analysis,
+                    response
+            );
+
+            document.setStatus(
+                    DocumentStatus.REVIEW_REQUIRED
+            );
+
+            LOGGER.info(
+                    "Document {} is ready for review.",
+                    document.getId()
+            );
+
+            return response;
+
+        } catch (Exception exception) {
+
+            LOGGER.error(
+                    "Document processing failed for document {}",
+                    document.getId(),
+                    exception
+            );
+
+            document.setStatus(
+                    DocumentStatus.FAILED
+            );
+
+            throw exception;
         }
-
-        /*
-         * Persist AI analysis.
-         */
-        DocumentAnalysis analysis =
-                documentAnalysisService.saveAnalysis(
-                        document,
-                        response
-                );
-
-        /*
-         * Persist extracted fields.
-         */
-        documentFieldService.saveFields(
-                analysis,
-                response
-        );
-
-        /*
-         * Temporary status update.
-         *
-         * The document is intentionally NOT saved here.
-         * A later feature will wrap:
-         *
-         * - AI Analysis
-         * - Extracted Fields
-         * - Document Status
-         *
-         * inside a single database transaction.
-         */
-        document.setStatus(
-                DocumentStatus.COMPLETED
-        );
-
-        return response;
     }
-
 }
